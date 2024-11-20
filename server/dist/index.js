@@ -15,15 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const keys_1 = require("./keys");
+const keys_2 = require("./keys");
 const mongoose_1 = __importDefault(require("mongoose"));
 const Schema = mongoose_1.default.Schema;
-const JWT_SECRET = "DARKSIDE";
 mongoose_1.default.connect('mongodb+srv://admin:g!VQGQn7tqB*82P@cluster0.ekkva.mongodb.net/feedback');
 const userSchema = new Schema({
     //@ts-ignore
     username: { type: "string", require: true, unique: true },
     //@ts-ignore
-    password: { type: "string", require: true, unique: true }
+    password: { type: "string", require: true, unique: true },
+    Admin: { type: 'boolean' }
 });
 const userModel = mongoose_1.default.model("users", userSchema);
 const app = (0, express_1.default)();
@@ -62,7 +64,7 @@ app.post('/signin', function (req, res) {
                 const result = yield bcrypt_1.default.compare(password, found.password);
                 const token = jsonwebtoken_1.default.sign({
                     username: username
-                }, JWT_SECRET);
+                }, keys_1.JWT_SECRET);
                 res.json({
                     token: token
                 });
@@ -80,4 +82,69 @@ app.post('/signin', function (req, res) {
         }
     });
 });
+app.post('/adminSignup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.body.username;
+    const password = req.body.password;
+    const keyAdmin = req.body.key;
+    const hashedpass = yield bcrypt_1.default.hash(password, 5);
+    if (keys_2.key === keyAdmin) {
+        try {
+            yield userModel.create({
+                username, password: hashedpass, Admin: true
+            });
+            res.json({
+                msg: "admin created"
+            });
+        }
+        catch (err) {
+            res.json({
+                msg: err.errmsg
+            });
+        }
+    }
+    else {
+        res.status(404).json({
+            msg: "User is not allowed to be admin"
+        });
+    }
+}));
+app.post('/adminSignin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.body.username;
+    const password = req.body.password;
+    const keyAdmin = req.body.key;
+    if (keys_2.key === keyAdmin) {
+        try {
+            const found = yield userModel.findOne({
+                username: username
+            });
+            console.log(found);
+            if (found) {
+                //@ts-ignore
+                const result = yield bcrypt_1.default.compare(password, found.password);
+                const token = jsonwebtoken_1.default.sign({
+                    username: username
+                }, keys_1.JWT_SECRET);
+                console.log(token);
+                res.json({
+                    token: token
+                });
+            }
+            else {
+                res.json({
+                    msg: "User not found"
+                });
+            }
+        }
+        catch (err) {
+            res.json({
+                msg: err.errmsg
+            });
+        }
+    }
+    else {
+        res.status(404).json({
+            msg: "User is not allowed to access"
+        });
+    }
+}));
 app.listen(3000);
