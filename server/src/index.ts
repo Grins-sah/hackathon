@@ -145,3 +145,5 @@ app.post('/adminSignin',async (req,res)=>{
 
 })
 app.listen(3000);
+// dashbord teacherid daashBoard profile pages
+// shareLink teacheradd 
