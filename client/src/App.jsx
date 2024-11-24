@@ -8,7 +8,9 @@ import {
   Link,
   useNavigate,
   Outlet,
+  BrowserRouter,
 } from "react-router-dom";
+
 
 const Home = ()=>{
   return(
@@ -24,7 +26,7 @@ const Account = ()=>{
   const emailRef = useRef();
   const passRef = useRef();
   const userObj = z.object({
-    username:z.string().min(3).max(10),
+    username:z.string().min(3).max(50),
     email: z.string().includes('@'),
     password:z.string().min(5).max(20)
 
@@ -42,25 +44,33 @@ const Account = ()=>{
       <div className='h-full w-1/2 py-10 border-l-2 px-32 border-[#b99dfb]'>
       <h1 className='text-5xl text-slate-100 font-bold'>Create  an  account</h1>
       <h1 className='mt-6 text-slate-400'>Already have an account??? <a href="/login" className='text-[#b99dfb] ml-5'>login</a></h1>
-      <form action="" method="post" className='mt-16'>
+      <div className='mt-16'>
         <input ref={nameRef} type="text" name="name" className='w-[40%] h-14 bg-[#3B364C] pl-5 text-slate-100 border-2 rounded border-[#3B364C] focus:border-[#9482BF] hover:border-[#9482BF]' placeholder='name' />
         <input ref={lastNameRef} type="text" name="lastName" className='w-[40%] h-14 ml-4 bg-[#3B364C] pl-5 text-slate-100 border-2 rounded border-[#3B364C] focus:border-[#9482BF] hover:border-[#9482BF]' placeholder='last name'/>
         <input ref={emailRef} type="email" name="email" className='w-[84%] h-14 bg-[#3B364C] mt-5 pl-5 text-slate-100 border-2 runded border-[#3B364C] focus:border-[#9482BF] hover:border-[#9482BF]' placeholder='email'/>
         <input ref={passRef} type="password" name="password" className='w-[84%] h-14 bg-[#3B364C] mt-5 pl-5 text-slate-100 border-2 rounded border-[#3B364C] focus:border-[#9482BF] hover:border-[#9482BF]' placeholder='password'/>
-        <button className='h-14 w-[84%] bg-[#b99dfb] mt-16 rounded hover:bg-[#b08eff]' onClick={async ()=>{
+        <button className='h-14 w-[84%] bg-[#b99dfb] mt-16 rounded hover:bg-[#b08eff]' onClick={  async ()=>{
             const userData ={
               username:nameRef.current.value+" "+lastNameRef.current.value,
               email:emailRef.current.value,
               password:passRef.current.value
             }
-          const result = await userObj.safeParseAsync();
-          console.log(result);
+            console.log(userData);
+          const result = await userObj.safeParseAsync(userData);
+
+            console.log(result);
           if(result.success){
             axios.post("http://localhost:3000/signup",userData)
           }
+          else{
+            console.log(result.error);
+          }
+
+          
+          
         
-        }}>Create account</button>
-      </form>
+        }} >Create account</button>
+      </div>
       </div>
     </div>
     </>
@@ -78,13 +88,13 @@ const Login = ()=>{
 const App = () => {
   return (
     <>
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />}> </Route>
-        <Route path='/create' element={<Account />}></Route>
-        <Route path='/login' element={<Login />}></Route>
-      </Routes>
-    </Router>
+    <BrowserRouter>
+        <Routes>
+          <Route path="/create" element={<Home />}> </Route>
+          <Route path='/' element={<Account />}></Route>
+          <Route path='/login' element={<Login />}></Route>
+        </Routes>
+    </BrowserRouter>
     </>
   )
 }
