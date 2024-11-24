@@ -16,7 +16,15 @@ const userSchema = new Schema({
     Admin:{type:'boolean'}
     
 })
+const teacherSchema = new Schema({
+    teacherName:{type:"string",require:true},
+    session:{type:"string",require:true},
+    dept:{type:"string",require:true},
+    classArr:{type:[],require:true},
+    subject:{type:"string",require:true}
+})
 const userModel   = mongoose.model("users",userSchema);
+const teacherModel = mongoose.model("teacher",teacherSchema);
 const app  = express();
 app.use(express.json());
 app.use(cors());
@@ -146,6 +154,53 @@ app.post('/adminSignin',async (req,res)=>{
 
 
 })
+app.post('/create',async (req,res)=>{
+    const teacherName = req.body.teacherName;
+    const session = req.body.session;
+    const deptName = req.body.deptName;
+    const classArr = req.body.classArr;
+    const subject = req.body.subject;
+    try{
+        const result = await teacherModel.create({teacherName,session,deptName,classArr,subject});
+        console.log(result); 
+        res.json({
+            msg:"success"
+        })
+    }catch(e:any){
+        res.json({
+            msg:e.errmsg
+        })
+    }
+});
+app.get('/teachers',async (req,res)=>{
+    const data = await teacherModel.find();
+    res.json({
+        msg:data
+    })
+})
+
+app.post('/teacher/:id',async (req,res)=>{
+    const id = req.params.id
+    const teacherName = req.body.teacherName;
+    const session = req.body.session;
+    const deptName = req.body.deptName;
+    const classArr = req.body.classArr;
+    const subject = req.body.subject;
+    try{
+        const found = teacherModel.findById(id);
+        await found.updateMany({teacherName,session,deptName,classArr,subject});
+        res.json({
+            msg:"Teacher Updated"
+        })
+    }
+    catch(e:any){
+        res.json({
+            msg:e.errmsg
+        })
+    }
+    
+})
+
 app.listen(3000);
 // dashbord teacherid daashBoard profile pages
 // shareLink teacheradd 

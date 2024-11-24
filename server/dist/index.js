@@ -28,7 +28,15 @@ const userSchema = new Schema({
     password: { type: "string", require: true, unique: true },
     Admin: { type: 'boolean' }
 });
+const teacherSchema = new Schema({
+    teacherName: { type: "string", require: true },
+    session: { type: "string", require: true },
+    dept: { type: "string", require: true },
+    classArr: { type: [], require: true },
+    subject: { type: "string", require: true }
+});
 const userModel = mongoose_1.default.model("users", userSchema);
+const teacherModel = mongoose_1.default.model("teacher", teacherSchema);
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
@@ -146,6 +154,51 @@ app.post('/adminSignin', (req, res) => __awaiter(void 0, void 0, void 0, functio
     else {
         res.status(404).json({
             msg: "User is not allowed to access"
+        });
+    }
+}));
+app.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const teacherName = req.body.teacherName;
+    const session = req.body.session;
+    const deptName = req.body.deptName;
+    const classArr = req.body.classArr;
+    const subject = req.body.subject;
+    try {
+        const result = yield teacherModel.create({ teacherName, session, deptName, classArr, subject });
+        console.log(result);
+        res.json({
+            msg: "success"
+        });
+    }
+    catch (e) {
+        res.json({
+            msg: e.errmsg
+        });
+    }
+}));
+app.get('/teachers', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield teacherModel.find();
+    res.json({
+        msg: data
+    });
+}));
+app.post('/teacher/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const teacherName = req.body.teacherName;
+    const session = req.body.session;
+    const deptName = req.body.deptName;
+    const classArr = req.body.classArr;
+    const subject = req.body.subject;
+    try {
+        const found = teacherModel.findById(id);
+        yield found.updateMany({ teacherName, session, deptName, classArr, subject });
+        res.json({
+            msg: "Teacher Updated"
+        });
+    }
+    catch (e) {
+        res.json({
+            msg: e.errmsg
         });
     }
 }));
