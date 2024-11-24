@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
-import z from 'zod'
+import z, { date } from 'zod'
 import axios from 'axios'
+import {atom,RecoilRoot,useRecoilState,useRecoilValue,useSetRecoilState} from 'recoil'
 import {
   BrowserRouter as Router,
   Routes,
@@ -19,12 +20,24 @@ const Home = ()=>{
     </>
   )
 }
+const displayAtom = atom({
+  key:"displayAtom",
+  default:""
+})
+
+const Display = ()=>{
+  const data = useRecoilValue(displayAtom);
+  return <div className='text-white'>
+    {data}
+  </div>
+}
 
 const Account = ()=>{
   const nameRef = useRef();
   const lastNameRef = useRef();
   const emailRef = useRef();
   const passRef = useRef();
+  const setDisplay = useSetRecoilState(displayAtom);
   const userObj = z.object({
     username:z.string().min(3).max(50),
     email: z.string().includes('@'),
@@ -58,9 +71,10 @@ const Account = ()=>{
             console.log(userData);
           const result = await userObj.safeParseAsync(userData);
 
-            console.log(result);
           if(result.success){
-            axios.post("http://localhost:3000/signup",userData)
+            const res = await axios.post("http://localhost:3000/signup",userData);
+            console.log(res);
+            setDisplay(res.data.msg);
           }
           else{
             console.log(result.error);
@@ -70,6 +84,7 @@ const Account = ()=>{
           
         
         }} >Create account</button>
+        <Display   />
       </div>
       </div>
     </div>
@@ -88,6 +103,7 @@ const Login = ()=>{
 const App = () => {
   return (
     <>
+    <RecoilRoot>
     <BrowserRouter>
         <Routes>
           <Route path="/create" element={<Home />}> </Route>
@@ -95,6 +111,7 @@ const App = () => {
           <Route path='/login' element={<Login />}></Route>
         </Routes>
     </BrowserRouter>
+    </RecoilRoot>
     </>
   )
 }

@@ -5,6 +5,7 @@ import {JWT_SECRET} from './keys'
 import { key } from './keys';
 import z, { optional, string } from 'zod'
 import mongoose from 'mongoose';
+import cors from 'cors'
 const Schema = mongoose.Schema;
 mongoose.connect('mongodb+srv://admin:g!VQGQn7tqB*82P@cluster0.ekkva.mongodb.net/feedback');
 const userSchema = new Schema({
@@ -18,6 +19,7 @@ const userSchema = new Schema({
 const userModel   = mongoose.model("users",userSchema);
 const app  = express();
 app.use(express.json());
+app.use(cors());
 interface User{
     username: string;
     password:string;

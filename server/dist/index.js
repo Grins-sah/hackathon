@@ -18,6 +18,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const keys_1 = require("./keys");
 const keys_2 = require("./keys");
 const mongoose_1 = __importDefault(require("mongoose"));
+const cors_1 = __importDefault(require("cors"));
 const Schema = mongoose_1.default.Schema;
 mongoose_1.default.connect('mongodb+srv://admin:g!VQGQn7tqB*82P@cluster0.ekkva.mongodb.net/feedback');
 const userSchema = new Schema({
@@ -30,6 +31,7 @@ const userSchema = new Schema({
 const userModel = mongoose_1.default.model("users", userSchema);
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 //@ts-ignore
 app.post('/signup', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -148,3 +150,5 @@ app.post('/adminSignin', (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 }));
 app.listen(3000);
+// dashbord teacherid daashBoard profile pages
+// shareLink teacheradd 
